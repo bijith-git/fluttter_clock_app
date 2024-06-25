@@ -17,8 +17,14 @@ class _TimerScreenState extends State<TimerScreen> {
       appBar: AppBar(
         title: Text(
           "Timer",
-          style: Theme.of(context).textTheme.titleLarge,
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge!
+              .copyWith(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert))
+        ],
       ),
       body: ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),

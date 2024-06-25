@@ -1,4 +1,5 @@
 import 'package:clock_app/core/constants/color.dart';
+import 'package:clock_app/features/clock/presentation/pages/clock.dart';
 import 'package:clock_app/features/stopwatch/presentation/pages/stopwatch.dart';
 import 'package:clock_app/features/timer/presentation/pages/timer.dart';
 import 'package:flutter/material.dart';
@@ -25,11 +26,9 @@ class _HomeState extends State<Home> {
     const Center(
       child: Text("Alram"),
     ),
-    const Center(
-      child: Text("World"),
-    ),
+    const ClockScreen(),
     const TimerScreen(),
-    StopWatchScreen(),
+    const StopWatchScreen(),
     const Center(
       child: Text("Bed Time"),
     ),
@@ -44,7 +43,7 @@ class _HomeState extends State<Home> {
           focusColor: Colors.transparent,
         ),
         child: BottomNavigationBar(
-          elevation: 0,
+          elevation: 10,
           selectedItemColor: ColorPalette.primary,
           mouseCursor: MouseCursor.defer,
           type: BottomNavigationBarType.fixed,

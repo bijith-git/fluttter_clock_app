@@ -40,11 +40,16 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
       appBar: AppBar(
         scrolledUnderElevation: 0,
         elevation: 0,
-        title: Text('Stopwatch',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge!
-                .copyWith(fontWeight: FontWeight.bold)),
+        title: Text(
+          'Stopwatch',
+          style: Theme.of(context)
+              .textTheme
+              .titleLarge!
+              .copyWith(fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -106,7 +111,7 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
                     // });
 
                     return ListView.builder(
-                      padding: EdgeInsets.only(bottom: 50),
+                      padding: const EdgeInsets.only(bottom: 50),
                       controller: _scrollController,
                       scrollDirection: Axis.vertical,
                       itemBuilder: (BuildContext context, int index) {
