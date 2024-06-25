@@ -1,3 +1,4 @@
+import 'package:clock_app/core/constants/color.dart';
 import 'package:flutter/material.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
@@ -18,7 +19,7 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
   @override
   void initState() {
     super.initState();
-    StopWatchTimer(
+    _stopWatchTimer = StopWatchTimer(
       mode: StopWatchMode.countUp,
       onChange: (value) => setState(() => isTimeRunning = true),
       onStopped: () => setState(() => isTimeRunning = false),
@@ -37,92 +38,98 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stopwatch'),
+        scrolledUnderElevation: 0,
+        elevation: 0,
+        title: Text('Stopwatch',
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge!
+                .copyWith(fontWeight: FontWeight.bold)),
       ),
-      body: Scrollbar(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 32,
-              horizontal: 16,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 32,
+          horizontal: 16,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            /// Display stop watch time
+            Center(
+              child: StreamBuilder<int>(
+                stream: _stopWatchTimer.rawTime,
+                initialData: _stopWatchTimer.rawTime.value,
+                builder: (context, snap) {
+                  final value = snap.data!;
+                  final displayTime =
+                      StopWatchTimer.getDisplayTime(value, hours: _isHours);
+                  return Container(
+                    width: 300,
+                    height: 300,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: ColorPalette.primary.withOpacity(.5)),
+                    child: Text(
+                      displayTime,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 40,
+                          fontFamily: 'Helvetica',
+                          fontWeight: FontWeight.bold),
+                    ),
+                  );
+                },
+              ),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                /// Display stop watch time
-                StreamBuilder<int>(
-                  stream: _stopWatchTimer.rawTime,
-                  initialData: _stopWatchTimer.rawTime.value,
+
+            /// Lap time.
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: SizedBox(
+                height: 200,
+                child: StreamBuilder<List<StopWatchRecord>>(
+                  stream: _stopWatchTimer.records,
+                  initialData: _stopWatchTimer.records.value,
                   builder: (context, snap) {
                     final value = snap.data!;
-                    final displayTime =
-                        StopWatchTimer.getDisplayTime(value, hours: _isHours);
-                    return Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Text(
-                        displayTime,
-                        style: const TextStyle(
-                            fontSize: 40,
-                            fontFamily: 'Helvetica',
-                            fontWeight: FontWeight.bold),
-                      ),
+                    if (value.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    // Future.delayed(const Duration(milliseconds: 100), () {
+                    //   _scrollController.animateTo(
+                    //       _scrollController.position.maxScrollExtent,
+                    //       duration: const Duration(milliseconds: 200),
+                    //       curve: Curves.easeOut);
+                    // });
+
+                    return ListView.builder(
+                      padding: EdgeInsets.only(bottom: 50),
+                      controller: _scrollController,
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (BuildContext context, int index) {
+                        final data = value[index];
+                        return Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Text(
+                            '#${index + 1} ${data.displayTime}',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      },
+                      itemCount: value.length,
                     );
                   },
                 ),
-
-                /// Lap time.
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: SizedBox(
-                    height: 100,
-                    child: StreamBuilder<List<StopWatchRecord>>(
-                      stream: _stopWatchTimer.records,
-                      initialData: _stopWatchTimer.records.value,
-                      builder: (context, snap) {
-                        final value = snap.data!;
-                        if (value.isEmpty) {
-                          return const SizedBox.shrink();
-                        }
-                        Future.delayed(const Duration(milliseconds: 100), () {
-                          _scrollController.animateTo(
-                              _scrollController.position.maxScrollExtent,
-                              duration: const Duration(milliseconds: 200),
-                              curve: Curves.easeOut);
-                        });
-
-                        return ListView.builder(
-                          controller: _scrollController,
-                          scrollDirection: Axis.vertical,
-                          itemBuilder: (BuildContext context, int index) {
-                            final data = value[index];
-                            return Column(
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: Text(
-                                    '#${index + 1} ${data.displayTime}',
-                                    style: const TextStyle(
-                                        fontSize: 17,
-                                        fontFamily: 'Helvetica',
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                const Divider(
-                                  height: 1,
-                                )
-                              ],
-                            );
-                          },
-                          itemCount: value.length,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -132,17 +139,21 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ElevatedButton(
-              onPressed: _stopWatchTimer.clearPresetTime,
+              onPressed: () {
+                _stopWatchTimer.clearPresetTime();
+                _stopWatchTimer.records.value.clear();
+              },
               child: const Icon(Icons.restart_alt_rounded),
             ),
-            ElevatedButton(
-              onPressed: _stopWatchTimer.onStopTimer,
-              child: const Icon(Icons.pause),
-            ),
-            ElevatedButton(
-              onPressed: _stopWatchTimer.onStartTimer,
-              child: const Icon(Icons.play_arrow),
-            ),
+            isTimeRunning
+                ? ElevatedButton(
+                    onPressed: _stopWatchTimer.onStopTimer,
+                    child: const Icon(Icons.pause),
+                  )
+                : ElevatedButton(
+                    onPressed: _stopWatchTimer.onStartTimer,
+                    child: const Icon(Icons.play_arrow),
+                  ),
             ElevatedButton(
               onPressed: _stopWatchTimer.onAddLap,
               child: const Icon(Icons.timer_outlined),
