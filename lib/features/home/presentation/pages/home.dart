@@ -1,4 +1,5 @@
 import 'package:clock_app/core/constants/color.dart';
+import 'package:clock_app/features/alram/presentation/pages/alram.dart';
 import 'package:clock_app/features/clock/presentation/pages/clock.dart';
 import 'package:clock_app/features/stopwatch/presentation/pages/stopwatch.dart';
 import 'package:clock_app/features/timer/presentation/pages/timer.dart';
@@ -23,9 +24,7 @@ class _HomeState extends State<Home> {
   }
 
   List<Widget> body = [
-    const Center(
-      child: Text("Alram"),
-    ),
+    const AlramScreen(),
     const ClockScreen(),
     const TimerScreen(),
     const StopWatchScreen(),
