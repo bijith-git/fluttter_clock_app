@@ -69,10 +69,11 @@ class _ClockScreenState extends State<ClockScreen> {
       body: Column(
         children: [
           SizedBox(
-            width: MediaQuery.of(context).size.width - 20,
-            height: 400,
+            width: MediaQuery.of(context).size.width - 10,
+            height: 250,
             child: _buildMapsWidget(),
           ),
+          SizedBox(height: 10),
           Text(
             DateFormat("hh:mm aa").format(DateTime.now()),
             style: Theme.of(context)
@@ -93,9 +94,9 @@ class _ClockScreenState extends State<ClockScreen> {
   }
 
   Widget _buildMapsWidget() {
-    return Center(
-        child: Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+    return Container(
+      height: 200,
+      padding: const EdgeInsets.symmetric(horizontal: 5),
       child: SfMapsTheme(
         data: const SfMapsThemeData(
           shapeHoverColor: Colors.transparent,
@@ -122,7 +123,7 @@ class _ClockScreenState extends State<ClockScreen> {
                   latitude: _worldClockData[index].latitude,
                   alignment: Alignment.topCenter,
                   offset: const Offset(0, -4),
-                  size: const Size(150, 150),
+                  size: const Size(200, 200),
                   child: _ClockWidget(
                       countryName: _worldClockData[index].countryName,
                       date: _worldClockData[index].date),
@@ -137,7 +138,7 @@ class _ClockScreenState extends State<ClockScreen> {
           ],
         ),
       ),
-    ));
+    );
   }
 }
 

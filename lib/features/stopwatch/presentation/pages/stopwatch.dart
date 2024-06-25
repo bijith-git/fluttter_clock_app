@@ -10,28 +10,30 @@ class StopWatchScreen extends StatefulWidget {
 }
 
 class _StopWatchScreenState extends State<StopWatchScreen> {
-  final _isHours = true;
+  bool isTimeRunning = false;
 
+  final _isHours = true;
+  final _scrollController = ScrollController();
   late StopWatchTimer _stopWatchTimer;
 
-  final _scrollController = ScrollController();
+  @override
+  void dispose() async {
+    super.dispose();
+    await _stopWatchTimer.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
     _stopWatchTimer = StopWatchTimer(
       mode: StopWatchMode.countUp,
-      onChange: (value) => setState(() => isTimeRunning = true),
+      onChange: (value) {
+        if (value != 0) {
+          setState(() => isTimeRunning = true);
+        }
+      },
       onStopped: () => setState(() => isTimeRunning = false),
     );
-  }
-
-  bool isTimeRunning = false;
-
-  @override
-  void dispose() async {
-    super.dispose();
-    await _stopWatchTimer.dispose();
   }
 
   @override
@@ -70,8 +72,8 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
                   final displayTime =
                       StopWatchTimer.getDisplayTime(value, hours: _isHours);
                   return Container(
-                    width: 300,
-                    height: 300,
+                    width: 250,
+                    height: 250,
                     alignment: Alignment.center,
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -81,7 +83,7 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
                       displayTime,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                          fontSize: 40,
+                          fontSize: 30,
                           fontFamily: 'Helvetica',
                           fontWeight: FontWeight.bold),
                     ),
@@ -94,7 +96,8 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: SizedBox(
-                height: 200,
+                // color: Colors.red,
+                height: 300,
                 child: StreamBuilder<List<StopWatchRecord>>(
                   stream: _stopWatchTimer.records,
                   initialData: _stopWatchTimer.records.value,
@@ -103,14 +106,17 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
                     if (value.isEmpty) {
                       return const SizedBox.shrink();
                     }
-                    // Future.delayed(const Duration(milliseconds: 100), () {
-                    //   _scrollController.animateTo(
-                    //       _scrollController.position.maxScrollExtent,
-                    //       duration: const Duration(milliseconds: 200),
-                    //       curve: Curves.easeOut);
-                    // });
+                    // if (value.length > 10) {
+                    //   Future.delayed(const Duration(milliseconds: 100), () {
+                    //     _scrollController.animateTo(
+                    //         _scrollController.position.maxScrollExtent,
+                    //         duration: const Duration(milliseconds: 200),
+                    //         curve: Curves.easeOut);
+                    //   });
+                    // }
 
                     return ListView.builder(
+                      reverse: true,
                       padding: const EdgeInsets.only(bottom: 50),
                       controller: _scrollController,
                       scrollDirection: Axis.vertical,
@@ -145,6 +151,9 @@ class _StopWatchScreenState extends State<StopWatchScreen> {
           children: [
             ElevatedButton(
               onPressed: () {
+                if (isTimeRunning) {
+                  _stopWatchTimer.onStopTimer();
+                }
                 _stopWatchTimer.clearPresetTime();
                 _stopWatchTimer.records.value.clear();
               },
