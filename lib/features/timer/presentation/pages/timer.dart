@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:clock_app/core/constants/color.dart';
+import 'package:clock_app/features/timer/presentation/pages/create_timer.dart';
 import 'package:flutter/material.dart';
 
 class TimerScreen extends StatefulWidget {
@@ -75,8 +76,12 @@ class _TimerScreenState extends State<TimerScreen> {
           }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(
+        heroTag: UniqueKey(),
         child: const Icon(Icons.add),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context)
+              .push(SlideUpTransition(page: CreatTimerScreen()));
+        },
       ),
     );
   }
